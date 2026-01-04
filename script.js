@@ -477,8 +477,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Scroll Animations with Intersection Observer
 const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    threshold: 0.01, // Уменьшен threshold для лучшего срабатывания
+    rootMargin: '0px' // Убрана отрицательная маржа для мобильных
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -491,15 +491,35 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
+// Проверка видимости элементов сразу при загрузке
+function checkInitialVisibility() {
+    const sections = document.querySelectorAll('.section, .feature, .delivery-item, .contact-item');
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        if (isVisible) {
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+        }
+    });
+}
+
 // Observe sections for animation
 document.addEventListener('DOMContentLoaded', () => {
-    const sections = document.querySelectorAll('.section, .feature, .delivery-item, .contact-item');
+    // Исключаем секцию каталога из observer
+    const sections = document.querySelectorAll('.section:not(.catalog), .feature, .delivery-item, .contact-item');
     sections.forEach(section => {
         section.style.opacity = '0';
         section.style.transform = 'translateY(30px)';
         section.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
         observer.observe(section);
     });
+    
+    // Проверяем видимость сразу после небольшой задержки
+    setTimeout(checkInitialVisibility, 100);
+    
+    // Дополнительная проверка после полной загрузки
+    window.addEventListener('load', checkInitialVisibility);
 });
 
 // Header scroll effect
@@ -531,13 +551,21 @@ window.addEventListener('scroll', () => {
 // Smooth reveal animations for products
 function animateProducts() {
     const productCards = document.querySelectorAll('.product-card');
+    const isMobile = window.innerWidth < 769;
+    
     productCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        setTimeout(() => {
+        // На мобильных сразу показываем, на десктопе с анимацией
+        if (isMobile) {
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
-        }, index * 50);
+        } else {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+        }
     });
 }
 
@@ -545,7 +573,9 @@ function animateProducts() {
 const originalRenderProducts = renderProducts;
 renderProducts = function() {
     originalRenderProducts();
-    setTimeout(animateProducts, 50);
+    // На мобильных не нужна задержка
+    const isMobile = window.innerWidth < 769;
+    setTimeout(animateProducts, isMobile ? 0 : 50);
 };
 
 // Initialize

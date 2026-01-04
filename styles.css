@@ -522,6 +522,8 @@ body {
 /* Catalog Section */
 .catalog {
     background: var(--bg-white);
+    opacity: 1 !important; /* Каталог всегда виден */
+    transform: none !important;
 }
 
 .filter-buttons {
@@ -574,8 +576,15 @@ body {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     border: 1px solid var(--border-color);
-    opacity: 0;
+    opacity: 1; /* Изменено с 0 на 1 для мобильных */
     animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Анимация только для десктопа, на мобильных сразу видно */
+@media (min-width: 769px) {
+    .product-card {
+        opacity: 0;
+    }
 }
 
 .product-card:nth-child(1) { animation-delay: 0.1s; }
@@ -846,8 +855,15 @@ body {
     border-radius: 20px;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border-color);
-    opacity: 0;
+    opacity: 1; /* Изменено для мобильных */
     animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Анимация только для десктопа */
+@media (min-width: 769px) {
+    .delivery-item {
+        opacity: 0;
+    }
 }
 
 .delivery-item:nth-child(1) { animation-delay: 0.1s; }
@@ -1255,6 +1271,16 @@ textarea:focus-visible {
 
     .logo h1 {
         font-size: 1.4rem;
+    }
+
+    /* Убеждаемся, что каталог всегда виден на мобильных */
+    .catalog,
+    .catalog .section-title,
+    .catalog .section-subtitle,
+    .catalog .filter-buttons,
+    .catalog .products-grid {
+        opacity: 1 !important;
+        transform: none !important;
     }
 
     .nav-menu {
